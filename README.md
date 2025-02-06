@@ -1,8 +1,8 @@
-A simpler alternative to [VibranceGUI](https://vibrancegui.com/) for cs2 and Nvidia GPUs.
+# A simpler alternative to [VibranceGUI](https://vibrancegui.com/) for cs2 and Nvidia GPUs.
 
-Autostartup:
-- Create a shortcut or copy the files in %appdata%\Microsoft\Windows\Start Menu\Programs\Startup
+## Autostartup
+Create a shortcut or copy the files in %appdata%\Microsoft\Windows\Start Menu\Programs\Startup
 
-Thanks to:
+## Thanks to
 - [NVIDIA_NvAPI](https://github.com/jNizM/NVIDIA_NvAPI)
 - [AutoHotkey](https://github.com/AutoHotkey/AutoHotkey)

@@ -15,7 +15,7 @@ if WinActive("ahk_exe cs2.exe") {
   #HotIf
   */
   NvAPI.SetDVCLevelEx(VibranceLevel, PrimaryMonitor - 1)
-  }
+}
 else {
   NvAPI.SetDVCLevelEx(DefaultVibranceLevel, PrimaryMonitor - 1)
 }

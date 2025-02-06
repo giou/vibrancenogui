@@ -8,14 +8,12 @@ PrimaryMonitor := MonitorGetPrimary()
 
 Loop {
 if WinActive("ahk_exe cs2.exe") {
-
   /*
   ; Optional. Disable win key while cs2 is active. Remove "/*" and "*/"
   #HotIf WinActive("ahk_exe cs2.exe")
     LWin::Return
   #HotIf
   */
-  
   NvAPI.SetDVCLevelEx(VibranceLevel, PrimaryMonitor - 1)
   }
 else {

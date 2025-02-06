@@ -1,5 +1,6 @@
-﻿#SingleInstance Force
+#SingleInstance Force
 #Include Class_NvAPI.ahk
+#Requires AutoHotkey v2.0-
 
 VibranceLevel := 80    ; change to desired vibrance
 DefaultVibranceLevel := 50    ; default windows vibrance
@@ -15,7 +16,7 @@ if WinActive("ahk_exe cs2.exe") {
   #HotIf
   */
   NvAPI.SetDVCLevelEx(VibranceLevel, PrimaryMonitor - 1)
-}
+ }
 else {
   NvAPI.SetDVCLevelEx(DefaultVibranceLevel, PrimaryMonitor - 1)
 }

@@ -9,7 +9,6 @@ PrimaryMonitor := MonitorGetPrimary()
 
 Loop {
 if not ProcessExist("cs2.exe"){
-  NvAPI.SetDVCLevelEx(WindowsVibranceLevel, PrimaryMonitor - 1)
   ProcessWait("cs2.exe")
 }
 else if WinActive("ahk_exe cs2.exe") {
@@ -21,6 +20,7 @@ else if WinActive("ahk_exe cs2.exe") {
   */
   NvAPI.SetDVCLevelEx(GameVibranceLevel, PrimaryMonitor - 1)
   WinWaitNotActive()
+  NvAPI.SetDVCLevelEx(WindowsVibranceLevel, PrimaryMonitor - 1)
 }
 else {
   NvAPI.SetDVCLevelEx(WindowsVibranceLevel, PrimaryMonitor - 1)

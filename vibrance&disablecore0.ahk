@@ -66,5 +66,5 @@ while true {
         WinWaitActive("ahk_exe cs2.exe")
     }
 
-    Sleep(1000)
+    Sleep(500)
 }

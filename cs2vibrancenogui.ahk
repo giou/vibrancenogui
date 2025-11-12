@@ -4,7 +4,7 @@
 
 GameVibranceLevel    := 80
 WindowsVibranceLevel := 50
-PrimaryMonitor       := MonitorGetPrimary() - 1
+PrimaryMonitor       := MonitorGetPrimary()
 
 SetVibrance(level) {
     static last := -1
@@ -28,3 +28,4 @@ while true {
     }
     Sleep(500)
 }
+

@@ -4,7 +4,7 @@
 
 GameVibranceLevel    := 80
 WindowsVibranceLevel := 50
-PrimaryMonitor       := MonitorGetPrimary() - 1
+PrimaryMonitor       := MonitorGetPrimary()
 
 psAffinitySet := "
 (

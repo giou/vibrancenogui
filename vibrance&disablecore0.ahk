@@ -5,8 +5,8 @@
 
 GameVibranceLevel    := 80
 WindowsVibranceLevel := 50
-PrimaryMonitor       := MonitorGetPrimary() ; if your primary display is not detected correctly add "- 1". No idea why.
 ; PrimaryMonitor       := MonitorGetPrimary() - 1
+PrimaryMonitor       := MonitorGetPrimary() ; if your primary display is not detected correctly add "- 1". No idea why.
 
 /*
 ; Optional. Win key disable (delete /* and  */)
@@ -38,9 +38,7 @@ ApplyAffinity() {
     static applied := false
     if (applied)
         return
-    try {
-        Run('PowerShell.exe -NoProfile -ExecutionPolicy Bypass -Command "(Get-Process cs2).ProcessorAffinity = [Convert]::ToInt64(`'1`' * $env:NUMBER_OF_PROCESSORS, 2) - 1"',, "Hide")
-    }
+    Run('PowerShell.exe -NoProfile -ExecutionPolicy Bypass -Command "(Get-Process cs2).ProcessorAffinity = [Convert]::ToInt64(`'1`' * $env:NUMBER_OF_PROCESSORS, 2) - 1"',, "Hide")
     applied := true
 }
 

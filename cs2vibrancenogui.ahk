@@ -5,8 +5,8 @@
 
 GameVibranceLevel    := 80
 WindowsVibranceLevel := 50
-; PrimaryMonitor       := MonitorGetPrimary() - 1
 PrimaryMonitor       := MonitorGetPrimary() ; if your primary display is not detected correctly add "- 1". No idea why.
+; PrimaryMonitor       := MonitorGetPrimary() - 1
 
 /*
 ; Optional. Win key disable (delete /* and  */)
@@ -33,3 +33,4 @@ while true {
     }
     Sleep(500)
 }
+

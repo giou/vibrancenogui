@@ -1,22 +1,19 @@
 #SingleInstance Force
-#Include Class_NvAPI.ahk
 #Requires AutoHotkey v2.0-
+
+#Include Class_NvAPI.ahk
 
 GameVibranceLevel    := 80
 WindowsVibranceLevel := 50
-PrimaryMonitor       := MonitorGetPrimary() - 1
+; PrimaryMonitor       := MonitorGetPrimary() - 1
+PrimaryMonitor       := MonitorGetPrimary() ; if your primary display is not detected correctly add "- 1". No idea why.
 
-psAffinitySet := "
-(
-Get-Process cs2 -ErrorAction SilentlyContinue | ForEach-Object {
-    `$mask = ([Convert]::ToInt64('1' * `$env:NUMBER_OF_PROCESSORS, 2)) - 1
-    `$_.ProcessorAffinity = `$mask
-}
-)"
-
+/*
+; Optional. Win key disable (delete /* and  */)
 #HotIf WinActive("ahk_exe cs2.exe")
     LWin::Return
 #HotIf
+ */
 
 SetVibrance(level) {
     static last := -1
@@ -34,7 +31,7 @@ ApplyAffinityOnce() {
         return
 
     timerSet := true
-    SetTimer(ApplyAffinity, -20000)  ; Wait 20s workaround affinity not applied
+    SetTimer(ApplyAffinity, -20000)  ; Wait 20s workaround affinity not applied, maybe cs2 applies it's own after lauch.
 }
 
 ApplyAffinity() {
@@ -42,7 +39,7 @@ ApplyAffinity() {
     if (applied)
         return
     try {
-        Run("PowerShell.exe -NoProfile -ExecutionPolicy Bypass -Command " psAffinitySet,, "Hide")
+        Run('PowerShell.exe -NoProfile -ExecutionPolicy Bypass -Command "(Get-Process cs2).ProcessorAffinity = [Convert]::ToInt64(`'1`' * $env:NUMBER_OF_PROCESSORS, 2) - 1"',, "Hide")
     }
     applied := true
 }

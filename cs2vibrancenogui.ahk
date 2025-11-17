@@ -1,10 +1,19 @@
 #SingleInstance Force
-#Include Class_NvAPI.ahk
 #Requires AutoHotkey v2.0-
+
+#Include Class_NvAPI.ahk
 
 GameVibranceLevel    := 80
 WindowsVibranceLevel := 50
-PrimaryMonitor       := MonitorGetPrimary() - 1
+; PrimaryMonitor       := MonitorGetPrimary() - 1
+PrimaryMonitor       := MonitorGetPrimary() ; if your primary display is not detected correctly add "- 1". No idea why.
+
+/*
+; Optional. Win key disable (delete /* and  */)
+#HotIf WinActive("ahk_exe cs2.exe")
+    LWin::Return
+#HotIf
+ */
 
 SetVibrance(level) {
     static last := -1
@@ -13,10 +22,6 @@ SetVibrance(level) {
         last := level
     }
 }
-
-#HotIf WinActive("ahk_exe cs2.exe")
-	LWin::Return
-#HotIf
 
 while true {
     if WinActive("ahk_exe cs2.exe") {
@@ -28,5 +33,3 @@ while true {
     }
     Sleep(500)
 }
-
-

@@ -23,7 +23,7 @@ SetVibrance(level) {
     }
 }
 
-while true {
+Loop {
     if WinActive("ahk_exe cs2.exe") {
         SetVibrance(GameVibranceLevel)
         WinWaitNotActive("ahk_exe cs2.exe")
@@ -31,5 +31,4 @@ while true {
         SetVibrance(WindowsVibranceLevel)
         WinWaitActive("ahk_exe cs2.exe")
     }
-    Sleep(500)
 }

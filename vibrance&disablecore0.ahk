@@ -15,6 +15,9 @@ PrimaryMonitor       := MonitorGetPrimary() ; if your primary display is not det
 #HotIf
  */
 
+global AffinityApplied := false
+global AffinityTimerSet := false
+
 SetVibrance(level) {
     static last := -1
     if (level != last) {
@@ -24,31 +27,28 @@ SetVibrance(level) {
 }
 
 ApplyAffinityOnce() {
-    static applied := false
-    static timerSet := false
-
-    if (applied || timerSet)
+    global AffinityTimerSet
+    if (AffinityTimerSet)
         return
-
-    timerSet := true
+    AffinityTimerSet := true
     SetTimer(ApplyAffinity, -20000)  ; Wait 20s workaround affinity not applied, maybe cs2 applies it's own after lauch.
 }
 
 ApplyAffinity() {
-    static applied := false
-    if (applied)
+    global AffinityApplied
+    if (AffinityApplied)
         return
     Run('PowerShell.exe -NoProfile -ExecutionPolicy Bypass -Command "(Get-Process cs2).ProcessorAffinity = [Convert]::ToInt64(`'1`' * $env:NUMBER_OF_PROCESSORS, 2) - 1"',, "Hide")
-    applied := true
+    AffinityApplied := true
 }
 
 while true {
     if !ProcessExist("cs2.exe") {
         SetVibrance(WindowsVibranceLevel)
-        ApplyAffinityOnce.applied := false
-        ApplyAffinityOnce.timerSet := false
+        SetTimer(ApplyAffinity, 0)
+        AffinityApplied  := false
+        AffinityTimerSet := false
         ProcessWait("cs2.exe")
-        continue
     }
 
     ApplyAffinityOnce()
@@ -58,7 +58,6 @@ while true {
         WinWaitNotActive("ahk_exe cs2.exe")
     } else {
         SetVibrance(WindowsVibranceLevel)
-        WinWaitActive("ahk_exe cs2.exe")
     }
 
     Sleep(500)

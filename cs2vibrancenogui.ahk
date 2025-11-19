@@ -5,8 +5,8 @@
 
 GameVibranceLevel    := 80
 WindowsVibranceLevel := 50
-PrimaryMonitor       := MonitorGetPrimary() ; if your primary display is not detected correctly add "- 1". No idea why.
-; PrimaryMonitor       := MonitorGetPrimary() - 1
+
+PrimaryMonitor := GetNvPrimaryID()
 
 /*
 ; Optional. Win key disable (delete /* and  */)
@@ -14,6 +14,13 @@ PrimaryMonitor       := MonitorGetPrimary() ; if your primary display is not det
     LWin::Return
 #HotIf
  */
+
+GetNvPrimaryID() {
+    primaryIdx := MonitorGetPrimary()      ; Get AHK's index for the primary monitor
+    name := MonitorGetName(primaryIdx)     ; Get the system name (e.g., \\.\DISPLAY1)
+    if RegExMatch(name, "\d+$", &match)    ; Extract the number at the end
+        return Integer(match[0]) - 1       ; Convert to 0-based index (Display1 -> 0)
+}
 
 SetVibrance(level) {
     static last := -1

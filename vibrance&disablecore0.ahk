@@ -5,17 +5,19 @@
 
 GameVibranceLevel    := 80
 WindowsVibranceLevel := 50
-
-PrimaryMonitor := GetNvPrimaryID()
-
-global AffinityTimerSet := false
+GameExe := "cs2.exe"
 
 ; Optional. Win key disable (delete /* and  */)
 /*
-#HotIf WinActive("ahk_exe cs2.exe")
+#HotIf WinActive(GameTarget)
     LWin::Return
 #HotIf
 */
+
+GameTarget := "ahk_exe " GameExe
+PrimaryMonitor := GetNvPrimaryID()
+
+global AffinityTimerSet := false
 
 GetNvPrimaryID() {
     primaryIdx := MonitorGetPrimary()      ; Get AHK's index for the primary monitor
@@ -45,18 +47,18 @@ ApplyAffinity() {
 }
 
 Loop {
-    if !ProcessExist("cs2.exe") {
+    if !ProcessExist(GameExe) {
         SetVibrance(WindowsVibranceLevel)
         SetTimer(ApplyAffinity, 0)
         AffinityTimerSet := false
-        ProcessWait("cs2.exe")
+        ProcessWait(GameExe)
     }
 
     ApplyAffinityOnce()
 
-    if WinActive("ahk_exe cs2.exe") {
+    if WinActive(GameTarget) {
         SetVibrance(GameVibranceLevel)
-        WinWaitNotActive("ahk_exe cs2.exe")
+        WinWaitNotActive(GameTarget)
     } else {
         SetVibrance(WindowsVibranceLevel)
     }

@@ -3,9 +3,10 @@
 
 #Include Class_NvAPI.ahk
 
+;--- config ---
 GameVibranceLevel    := 80
 WindowsVibranceLevel := 50
-GameExe := "ahk_exe cs2.exe"
+GameExe := "cs2.exe"
 
 /*
 ; Optional. Win key disable (delete /* and  */)
@@ -13,7 +14,9 @@ GameExe := "ahk_exe cs2.exe"
     LWin::Return
 #HotIf
  */
+;--- config end ---
 
+GameTarget := "ahk_exe " GameExe
 PrimaryMonitor := GetNvPrimaryID()
 
 GetNvPrimaryID() {
@@ -32,11 +35,11 @@ SetVibrance(level) {
 }
 
 Loop {
-    if WinActive(GameExe) {
+    if WinActive(GameTarget) {
         SetVibrance(GameVibranceLevel)
-        WinWaitNotActive(GameExe)
+        WinWaitNotActive(GameTarget)
     } else {
         SetVibrance(WindowsVibranceLevel)
-        WinWaitActive(GameExe)
+        WinWaitActive(GameTarget)
     }
 }

@@ -5,6 +5,7 @@
 
 GameVibranceLevel    := 80
 WindowsVibranceLevel := 50
+GameExe := "ahk_exe cs2.exe"
 
 PrimaryMonitor := GetNvPrimaryID()
 
@@ -31,11 +32,11 @@ SetVibrance(level) {
 }
 
 Loop {
-    if WinActive("ahk_exe cs2.exe") {
+    if WinActive(GameExe) {
         SetVibrance(GameVibranceLevel)
-        WinWaitNotActive("ahk_exe cs2.exe")
+        WinWaitNotActive(GameExe)
     } else {
         SetVibrance(WindowsVibranceLevel)
-        WinWaitActive("ahk_exe cs2.exe")
+        WinWaitActive(GameExe)
     }
 }

@@ -3,6 +3,7 @@
 
 #Include Class_NvAPI.ahk
 
+;--- config ---
 GameVibranceLevel    := 80
 WindowsVibranceLevel := 50
 GameExe := "cs2.exe"
@@ -13,6 +14,7 @@ GameExe := "cs2.exe"
     LWin::Return
 #HotIf
 */
+;--- config end ---
 
 GameTarget := "ahk_exe " GameExe
 PrimaryMonitor := GetNvPrimaryID()
@@ -43,7 +45,8 @@ ApplyAffinityOnce() {
 }
 
 ApplyAffinity() {
-    Run('PowerShell.exe -NoProfile -ExecutionPolicy Bypass -Command "(Get-Process cs2).ProcessorAffinity = [Convert]::ToInt64(`'1`' * $env:NUMBER_OF_PROCESSORS, 2) - 1"',, "Hide")
+    ProcName := StrReplace(GameExe, ".exe", "")
+    Run(Format('PowerShell.exe -NoProfile -ExecutionPolicy Bypass -Command "(Get-Process {1}).ProcessorAffinity = [Convert]::ToInt64(`'1`' * $env:NUMBER_OF_PROCESSORS, 2) - 1"', ProcName),, "Hide")
 }
 
 Loop {

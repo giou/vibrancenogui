@@ -7,14 +7,14 @@ GameVibranceLevel    := 80
 WindowsVibranceLevel := 50
 GameExe := "ahk_exe cs2.exe"
 
-PrimaryMonitor := GetNvPrimaryID()
-
 /*
 ; Optional. Win key disable (delete /* and  */)
 #HotIf WinActive("ahk_exe cs2.exe")
     LWin::Return
 #HotIf
  */
+
+PrimaryMonitor := GetNvPrimaryID()
 
 GetNvPrimaryID() {
     primaryIdx := MonitorGetPrimary()      ; Get AHK's index for the primary monitor

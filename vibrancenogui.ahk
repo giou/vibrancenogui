@@ -3,27 +3,28 @@
 
 #Include Class_NvAPI.ahk
 
-;--- config ---
+; --- Configuration ---
 GameVibranceLevel    := 80
 WindowsVibranceLevel := 50
-GameExe := "cs2.exe"
+GameExe              := "cs2.exe"
 
-/*
 ; Optional. Win key disable (delete /* and  */)
-#HotIf WinActive("ahk_exe cs2.exe")
+/*
+#HotIf WinActive(GameTarget)
     LWin::Return
 #HotIf
- */
-;--- config end ---
+*/
+; ---------------------
 
-GameTarget := "ahk_exe " GameExe
+GameTarget     := "ahk_exe " GameExe
 PrimaryMonitor := GetNvPrimaryID()
 
+; Start the Watchdog
+SetTimer(WindowFocus, 1000)
+
 GetNvPrimaryID() {
-    primaryIdx := MonitorGetPrimary()      ; Get AHK's index for the primary monitor
-    name := MonitorGetName(primaryIdx)     ; Get the system name (e.g., \\.\DISPLAY1)
-    if RegExMatch(name, "\d+$", &match)    ; Extract the number at the end
-        return Integer(match[0]) - 1       ; Convert to 0-based index (Display1 -> 0)
+    ; Returns 0-based index of primary monitor (e.g., Display1 -> 0)
+    return Integer(SubStr(MonitorGetName(MonitorGetPrimary()), 12)) - 1
 }
 
 SetVibrance(level) {
@@ -34,12 +35,9 @@ SetVibrance(level) {
     }
 }
 
-Loop {
-    if WinActive(GameTarget) {
+WindowFocus() {
+    if WinActive(GameTarget)
         SetVibrance(GameVibranceLevel)
-        WinWaitNotActive(GameTarget)
-    } else {
+    else
         SetVibrance(WindowsVibranceLevel)
-        WinWaitActive(GameTarget)
-    }
 }

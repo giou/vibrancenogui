@@ -1,7 +1,3 @@
-; ========================================================================================
-;   CS2 Vibrance & Core 0 Disabler (Combined with Minimal NvAPI)
-; ========================================================================================
-
 #SingleInstance Force
 #Requires AutoHotkey v2.0-
 
@@ -18,11 +14,9 @@ GameExe              := "cs2.exe"   ; Process name to watch
 */
 ; ---------------------
 
-; --- Main Logic ---
-
 GameTarget       := "ahk_exe " GameExe
 PrimaryMonitor   := GetNvPrimaryID()
-AffinityCallback := ApplyAffinity.Bind(GameExe) ; Create the bound function once
+AffinityCallback := ApplyAffinity.Bind(GameExe)
 
 ; Start the Watchdog
 SetTimer(CheckGameState, 1000)
@@ -118,7 +112,6 @@ class NvAPI
 		return DllCall(this.NvDLL "\nvapi_QueryInterface", "UInt", NvID, "CDecl UPtr")
 	}
 
-	; // Function: EnumNvidiaDisplayHandle
 	static EnumNvidiaDisplayHandle(thisEnum := 0)
 	{
 		if !(NvStatus := DllCall(this.QueryInterface(0x9ABDD40D), "UInt", thisEnum, "Ptr*", &NvDisplayHandle := 0, "CDecl"))
@@ -126,27 +119,25 @@ class NvAPI
 		return this.GetErrorMessage(NvStatus)
 	}
 
-	; // Function: GetDVCInfoEx (Required for SetDVCLevelEx bounds checking)
 	static GetDVCInfoEx(thisEnum := 0)
 	{
 		static NV_DISPLAY_DVC_INFO_EX := (5 * 4)
 
 		hNvDisplay := this.EnumNvidiaDisplayHandle(thisEnum)
 		DVCInfo := Buffer(NV_DISPLAY_DVC_INFO_EX, 0)
-		NumPut("UInt", NV_DISPLAY_DVC_INFO_EX | 0x10000, DVCInfo, 0)    ; [IN] version info
+		NumPut("UInt", NV_DISPLAY_DVC_INFO_EX | 0x10000, DVCInfo, 0)
 		if !(NvStatus := DllCall(this.QueryInterface(0x0E45002D), "Ptr", hNvDisplay, "UInt", outputId := 0, "Ptr", DVCInfo, "CDecl"))
 		{
 			DVC_INFO_EX := Map()
-			DVC_INFO_EX["currentLevel"] := NumGet(DVCInfo,  4, "Int")   ; [OUT] current DVC level
-			DVC_INFO_EX["minLevel"]     := NumGet(DVCInfo,  8, "Int")   ; [OUT] min range level
-			DVC_INFO_EX["maxLevel"]     := NumGet(DVCInfo, 12, "Int")   ; [OUT] max range level
-			DVC_INFO_EX["defaultLevel"] := NumGet(DVCInfo, 16, "Int")   ; [OUT] default DVC level
+			DVC_INFO_EX["currentLevel"] := NumGet(DVCInfo,  4, "Int")
+			DVC_INFO_EX["minLevel"]     := NumGet(DVCInfo,  8, "Int")
+			DVC_INFO_EX["maxLevel"]     := NumGet(DVCInfo, 12, "Int")
+			DVC_INFO_EX["defaultLevel"] := NumGet(DVCInfo, 16, "Int")
 			return DVC_INFO_EX
 		}
 		return this.GetErrorMessage(NvStatus)
 	}
 
-	; // Function: SetDVCLevelEx (The main function used)
 	static SetDVCLevelEx(currentLevel, thisEnum := 0)
 	{
 		static NV_DISPLAY_DVC_INFO_EX := (5 * 4) 
@@ -157,14 +148,13 @@ class NvAPI
 			
 		if (currentLevel < DVC["minLevel"]) || (currentLevel > DVC["maxLevel"])
 		{
-			; Silently fail or clamp could be better, but keeping original logic
 			return 0
 		}
 
 		hNvDisplay := this.EnumNvidiaDisplayHandle(thisEnum)
 		DVCInfo := Buffer(NV_DISPLAY_DVC_INFO_EX, 0)
-		NumPut("UInt", NV_DISPLAY_DVC_INFO_EX | 0x10000, DVCInfo, 0)   ; [IN] version info
-		NumPut("Int", currentLevel, DVCInfo, 4)                        ; [IN] current DVC level
+		NumPut("UInt", NV_DISPLAY_DVC_INFO_EX | 0x10000, DVCInfo, 0)
+		NumPut("Int", currentLevel, DVCInfo, 4)
 		if !(NvStatus := DllCall(this.QueryInterface(0x4A82C2B1), "Ptr", hNvDisplay, "UInt", outputId := 0, "Ptr", DVCInfo, "CDECL"))
 		{
 			return currentLevel
@@ -173,10 +163,9 @@ class NvAPI
 		return NvAPI.GetErrorMessage(NvStatus)
 	}
 
-	; // Function: GetErrorMessage
 	static GetErrorMessage(ErrorCode)
 	{
-		Desc := Buffer(64, 0) ; Const.NVAPI_SHORT_STRING_MAX is 64
+		Desc := Buffer(64, 0)
 		DllCall(this.QueryInterface(0x6C2D048C), "Ptr", ErrorCode, "Ptr", Desc, "CDecl")
 		return "Error: " StrGet(Desc, "CP0")
 	}

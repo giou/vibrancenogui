@@ -1,12 +1,14 @@
+; ========================================================================================
+;   CS2 Vibrance & Core 0 Disabler (Combined with Minimal NvAPI)
+; ========================================================================================
+
 #SingleInstance Force
 #Requires AutoHotkey v2.0-
 
-#Include Class_NvAPI.ahk
-
 ; --- Configuration ---
-GameVibranceLevel    := 80
-WindowsVibranceLevel := 50
-GameExe              := "cs2.exe"
+GameVibranceLevel    := 80          ; Vibrance level when game is active (0-100)
+WindowsVibranceLevel := 50          ; Vibrance level for desktop/other apps (usually 50)
+GameExe              := "cs2.exe"   ; Process name to watch
 
 ; Optional. Win key disable (delete /* and  */)
 /*
@@ -15,6 +17,8 @@ GameExe              := "cs2.exe"
 #HotIf
 */
 ; ---------------------
+
+; --- Main Logic ---
 
 GameTarget       := "ahk_exe " GameExe
 PrimaryMonitor   := GetNvPrimaryID()
@@ -52,7 +56,7 @@ CheckGameState() {
 SetVibrance(level) {
     static lastLevel := -1
     if (level != lastLevel) {
-        try NvAPI.SetDVCLevelEx(level, PrimaryMonitor)
+        NvAPI.SetDVCLevelEx(level, PrimaryMonitor)
         lastLevel := level
     }
 }
@@ -75,6 +79,105 @@ ApplyAffinity(exeName) {
 }
 
 GetNvPrimaryID() {
-    ; Returns 0-based index of primary monitor (e.g., Display1 -> 0)
     return Integer(SubStr(MonitorGetName(MonitorGetPrimary()), 12)) - 1
+}
+
+
+; ========================================================================================
+;   MINIMAL NvAPI CLASS (Stripped for Vibrance Only)
+; ========================================================================================
+
+class NvAPI
+{
+	static NvDLL := (A_PtrSize = 8) ? "nvapi64.dll" : "nvapi.dll"
+	static _Init := NvAPI.__Initialize()
+
+	static __Initialize()
+	{
+		if !(this.hModule := DllCall("LoadLibrary", "Str", this.NvDLL, "Ptr"))
+		{
+			MsgBox("NvAPI could not be started!`n`nThe program will exit!", A_ThisFunc)
+			ExitApp
+		}
+		if (NvStatus := DllCall(DllCall(this.NvDLL "\nvapi_QueryInterface", "UInt", 0x0150E828, "CDecl UPtr"), "CDecl") != 0)
+		{
+			MsgBox("NvAPI initialization failed: [ " NvStatus " ]`n`nThe program will exit!", A_ThisFunc)
+			ExitApp
+		}
+	}
+
+	static __Delete()
+	{
+		DllCall(DllCall(this.NvDLL "\nvapi_QueryInterface", "UInt", 0xD22BDD7E, "CDecl UPtr"), "CDecl")
+		if (this.hModule)
+			DllCall("FreeLibrary", "Ptr", this.hModule)
+	}
+
+	static QueryInterface(NvID)
+	{
+		return DllCall(this.NvDLL "\nvapi_QueryInterface", "UInt", NvID, "CDecl UPtr")
+	}
+
+	; // Function: EnumNvidiaDisplayHandle
+	static EnumNvidiaDisplayHandle(thisEnum := 0)
+	{
+		if !(NvStatus := DllCall(this.QueryInterface(0x9ABDD40D), "UInt", thisEnum, "Ptr*", &NvDisplayHandle := 0, "CDecl"))
+			return NvDisplayHandle
+		return this.GetErrorMessage(NvStatus)
+	}
+
+	; // Function: GetDVCInfoEx (Required for SetDVCLevelEx bounds checking)
+	static GetDVCInfoEx(thisEnum := 0)
+	{
+		static NV_DISPLAY_DVC_INFO_EX := (5 * 4)
+
+		hNvDisplay := this.EnumNvidiaDisplayHandle(thisEnum)
+		DVCInfo := Buffer(NV_DISPLAY_DVC_INFO_EX, 0)
+		NumPut("UInt", NV_DISPLAY_DVC_INFO_EX | 0x10000, DVCInfo, 0)    ; [IN] version info
+		if !(NvStatus := DllCall(this.QueryInterface(0x0E45002D), "Ptr", hNvDisplay, "UInt", outputId := 0, "Ptr", DVCInfo, "CDecl"))
+		{
+			DVC_INFO_EX := Map()
+			DVC_INFO_EX["currentLevel"] := NumGet(DVCInfo,  4, "Int")   ; [OUT] current DVC level
+			DVC_INFO_EX["minLevel"]     := NumGet(DVCInfo,  8, "Int")   ; [OUT] min range level
+			DVC_INFO_EX["maxLevel"]     := NumGet(DVCInfo, 12, "Int")   ; [OUT] max range level
+			DVC_INFO_EX["defaultLevel"] := NumGet(DVCInfo, 16, "Int")   ; [OUT] default DVC level
+			return DVC_INFO_EX
+		}
+		return this.GetErrorMessage(NvStatus)
+	}
+
+	; // Function: SetDVCLevelEx (The main function used)
+	static SetDVCLevelEx(currentLevel, thisEnum := 0)
+	{
+		static NV_DISPLAY_DVC_INFO_EX := (5 * 4) 
+
+		DVC := this.GetDVCInfoEx(thisEnum)
+		if !IsObject(DVC)
+			return 0
+			
+		if (currentLevel < DVC["minLevel"]) || (currentLevel > DVC["maxLevel"])
+		{
+			; Silently fail or clamp could be better, but keeping original logic
+			return 0
+		}
+
+		hNvDisplay := this.EnumNvidiaDisplayHandle(thisEnum)
+		DVCInfo := Buffer(NV_DISPLAY_DVC_INFO_EX, 0)
+		NumPut("UInt", NV_DISPLAY_DVC_INFO_EX | 0x10000, DVCInfo, 0)   ; [IN] version info
+		NumPut("Int", currentLevel, DVCInfo, 4)                        ; [IN] current DVC level
+		if !(NvStatus := DllCall(this.QueryInterface(0x4A82C2B1), "Ptr", hNvDisplay, "UInt", outputId := 0, "Ptr", DVCInfo, "CDECL"))
+		{
+			return currentLevel
+		}
+
+		return NvAPI.GetErrorMessage(NvStatus)
+	}
+
+	; // Function: GetErrorMessage
+	static GetErrorMessage(ErrorCode)
+	{
+		Desc := Buffer(64, 0) ; Const.NVAPI_SHORT_STRING_MAX is 64
+		DllCall(this.QueryInterface(0x6C2D048C), "Ptr", ErrorCode, "Ptr", Desc, "CDecl")
+		return "Error: " StrGet(Desc, "CP0")
+	}
 }

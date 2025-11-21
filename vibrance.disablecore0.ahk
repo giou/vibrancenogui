@@ -6,12 +6,10 @@ GameVibranceLevel    := 80          ; Vibrance level when game is active (0-100)
 WindowsVibranceLevel := 50          ; Vibrance level for desktop/other apps (usually 50)
 GameExe              := "cs2.exe"   ; Process name to watch
 
-; Optional. Win key disable (delete /* and  */)
-/*
+; Optional. Win key disable
 #HotIf WinActive(GameTarget)
     LWin::Return
 #HotIf
-*/
 ; ---------------------
 
 GameTarget       := "ahk_exe " GameExe

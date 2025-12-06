@@ -24,8 +24,8 @@ GetNvPrimaryID() {
 SetVibrance(level) {
     static last := -1
     if (level != last) {
-		PrimaryMonitor := GetNvPrimaryID()
-        NvAPI.SetDVCLevelEx(level, PrimaryMonitor)
+		PrimaryMonitorID := GetNvPrimaryID()
+        NvAPI.SetDVCLevelEx(level, PrimaryMonitorID)
         last := level
     }
 }

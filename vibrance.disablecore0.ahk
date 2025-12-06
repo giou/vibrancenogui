@@ -13,7 +13,6 @@ GameExe              := "cs2.exe"   ; Process name to watch
 ; ---------------------
 
 GameTarget       := "ahk_exe " GameExe
-PrimaryMonitor   := GetNvPrimaryID()
 AffinityCallback := ApplyAffinity.Bind(GameExe)
 
 ; Start the Watchdog
@@ -48,7 +47,8 @@ CheckGameState() {
 SetVibrance(level) {
     static lastLevel := -1
     if (level != lastLevel) {
-        NvAPI.SetDVCLevelEx(level, PrimaryMonitor)
+		PrimaryMonitorID   := GetNvPrimaryID()
+        NvAPI.SetDVCLevelEx(level, PrimaryMonitorID)
         lastLevel := level
     }
 }

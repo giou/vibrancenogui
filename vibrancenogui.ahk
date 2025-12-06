@@ -13,7 +13,6 @@ GameExe              := "cs2.exe"   ; Process name to watch
 ; ---------------------
 
 GameTarget     := "ahk_exe " GameExe
-PrimaryMonitor := GetNvPrimaryID()
 
 ; Start the Watchdog
 SetTimer(WindowFocus, 1000)
@@ -25,6 +24,7 @@ GetNvPrimaryID() {
 SetVibrance(level) {
     static last := -1
     if (level != last) {
+		PrimaryMonitor := GetNvPrimaryID()
         NvAPI.SetDVCLevelEx(level, PrimaryMonitor)
         last := level
     }
